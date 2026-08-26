@@ -3,16 +3,18 @@ cask "letthembuild" do
 
   on_arm do
     sha256 "ee65a39f7d23058144349cad1d3800aa8731491e542f7d3f2bb71b0b5c22459c"
+
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-arm64-mac.zip"
   end
   on_intel do
     sha256 "c2a4b83b0301083c94eb47527434479d0f4d84fe8f266d9dbfa41f30a518157e"
+
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-x64-mac.zip"
   end
 
   name "LetThemBuild"
-  desc "AI group chat with hands: Claude, ChatGPT, Gemini and Grok build and review in your checkout"
-  homepage "https://letthembuild.com"
+  desc "AI group that builds and reviews in your checkout, with hands"
+  homepage "https://letthembuild.com/"
 
   livecheck do
     url "https://letthembuild.com/updates/latest-mac.yml"
@@ -20,9 +22,11 @@ cask "letthembuild" do
   end
 
   auto_updates true
-  depends_on macos: ">= :ventura"
+  depends_on macos: :ventura
 
   app "LetThemBuild.app"
+  binary "#{staged_path}/ltb", target: "ltb"
+  binary "#{staged_path}/ltb", target: "letthembuild"
 
   # The `ltb` command line. Builds up to 1.1.43 carry the script only inside
   # app.asar, where nothing outside the app can link it — so this release's
@@ -30,6 +34,7 @@ cask "letthembuild" do
   # the app installs from Settings. Newer builds ship it unpacked at
   # Contents/Resources/bin/letthembuild; when the cask moves past 1.1.43 this
   # preflight goes and a plain binary stanza takes over.
+  # ${Version} in it is dpkg's, not Ruby's.
   preflight do
     File.write "#{staged_path}/ltb", <<~'CLI'
       #!/usr/bin/env bash
@@ -154,13 +159,11 @@ cask "letthembuild" do
     CLI
     FileUtils.chmod 0755, "#{staged_path}/ltb"
   end
-  binary "#{staged_path}/ltb", target: "ltb"
-  binary "#{staged_path}/ltb", target: "letthembuild"
 
   zap trash: [
     "~/Library/Application Support/LetThemChat",
-    "~/Library/Logs/letthembuild-vscode.log",
     "~/Library/Logs/letthembuild-cursor.log",
+    "~/Library/Logs/letthembuild-vscode.log",
   ]
 
   caveats <<~EOS
