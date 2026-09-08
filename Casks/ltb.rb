@@ -20,15 +20,15 @@
 # tap's cask_renames.json maps letthembuild -> ltb, which Homebrew resolves as
 # a rename and tells the user about.
 cask "ltb" do
-  version "1.1.82"
+  version "1.1.83"
 
   on_arm do
-    sha256 "8e743fa2d7cc15f52a66f8ec80ab6c571baed89e569c56f5fa9f39e283b90352"
+    sha256 "d7041192f60ce35a1089eee9f87dbf450d8a06b628537c7ea8971a752178b58b"
 
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-arm64-mac.zip"
   end
   on_intel do
-    sha256 "b06ec412ce0f424052ee459ea6d7b5dcb96825c8bf83d28116771f4d0a547495"
+    sha256 "c64bebba5204402e3aa9e61c412dfeb913f1ca5aca8d2ab1a5c177e3dc6c3a49"
 
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-x64-mac.zip"
   end
@@ -95,28 +95,14 @@ cask "ltb" do
   # Anything under Cellar or Caskroom belongs to Homebrew; those are left alone
   # so it can report the conflict itself.
   #
-  # Placed after the artifacts and run before them: `preflight` executes ahead
-  # of the install, but the cask stanza order puts it here.
-  preflight do
-    ["ltb", "letthembuild"].each do |name|
-      target = Pathname.new("#{HOMEBREW_PREFIX}/bin/#{name}")
-      # symlink? as well as exist?, because exist? follows a link and a dangling
-      # one still occupies the name Homebrew is about to want.
-      next if !target.symlink? && !target.exist?
-
-      link = target.symlink? ? target.readlink.to_s : nil
-      next if link&.include?("/Cellar/") || link&.include?("/Caskroom/")
-
-      ours = if link
-        File.basename(link) == "letthembuild"
-      else
-        target.file? && target.size < 65_536 && target.read.include?("LETTHEMBUILD_APP")
-      end
-      next unless ours
-
-      opoo "Replacing #{target}, which LetThemBuild's own Settings pane installed."
-      FileUtils.rm target
-    end
+  # Placed after the artifacts and run before them: the steps execute ahead
+  # of the install, but the cask stanza order puts them here. Declarative, as
+  # Homebrew 6 requires: `remove` with a filter only touches what matches —
+  # a symlink whose target names our own script, or a file carrying our
+  # marker — and leaves anything else with those names where it is.
+  preflight_steps do
+    remove ["ltb", "letthembuild"], base: :bin, symlink_target_contains: "letthembuild"
+    remove ["ltb", "letthembuild"], base: :bin, content_contains: "LETTHEMBUILD_APP"
   end
 
   # An upgrade that replaces a running .app leaves the old one running against
