@@ -100,9 +100,14 @@ cask "ltb" do
   # Homebrew 6 requires: `remove` with a filter only touches what matches —
   # a symlink whose target names our own script, or a file carrying our
   # marker — and leaves anything else with those names where it is.
+  #
+  # The base is `:binarydir`: Homebrew resolves a base by calling that name on
+  # the cask's config, and the config's name for the folder a `binary` stanza
+  # links into is `binarydir`. `:bin` named nothing, and Homebrew 7 refused the
+  # whole install with "unknown install step base: bin" (1.1.181).
   preflight_steps do
-    remove ["ltb", "letthembuild"], base: :bin, symlink_target_contains: "letthembuild"
-    remove ["ltb", "letthembuild"], base: :bin, content_contains: "LETTHEMBUILD_APP"
+    remove ["ltb", "letthembuild"], base: :binarydir, symlink_target_contains: "letthembuild"
+    remove ["ltb", "letthembuild"], base: :binarydir, content_contains: "LETTHEMBUILD_APP"
   end
 
   # An upgrade that replaces a running .app leaves the old one running against
