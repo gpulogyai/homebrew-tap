@@ -20,15 +20,15 @@
 # tap's cask_renames.json maps letthembuild -> ltb, which Homebrew resolves as
 # a rename and tells the user about.
 cask "ltb" do
-  version "1.1.366"
+  version "1.1.367"
 
   on_arm do
-    sha256 "62e3b1e1591094e48de86edea0d8f4fe456acd0de022b657c2cb802322ec75ef"
+    sha256 "31fc2b1ccd4b8396f0df6e80024b28ac595595c60a5c85a4d209613412d106bd"
 
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-arm64-mac.zip"
   end
   on_intel do
-    sha256 "505beb1bfcdaf2afbff1dc4319e754d4a97b8ff30296ac97db69230f498c59aa"
+    sha256 "8d8891a8f20a7634b736cd0ee0c0bd7bd6c823dc451ee52de6221405f26e7758"
 
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-x64-mac.zip"
   end
@@ -115,17 +115,18 @@ cask "ltb" do
   # while the app is open.
   uninstall quit: "com.letthemchat.desktop"
 
-  # `brew uninstall --zap`. Application Support is "LetThemChat" — NOT the
-  # product name. main.js line 12 calls app.setName("LetThemChat"), and
-  # Electron keys userData on the app name, so that is where every setting,
-  # session and stored key actually lives. This was "corrected" to
-  # LetThemBuild once, on the productName theory, without checking the disk;
-  # the original value had been right all along. The test now derives the
-  # path from app.setName itself so the two cannot drift apart again.
+  # `brew uninstall --zap`. Application Support holds one of two folders,
+  # chosen by lib/data-identity.js when the app starts: "LetThemChat" on a
+  # machine that already had it (every install before 2026-10-27 — its
+  # settings, sessions and the name its stored keys are encrypted under), and
+  # "LetThemBuild" for a new user. Both are listed; zap skips the one that is
+  # not there. The test derives the names from that module so the two cannot
+  # drift apart.
   #
   # ~/Documents/LetThemBuild is deliberately absent: those are the user's own
   # checkouts and worktrees, which is their work, not this app's state.
   zap trash: [
+    "~/Library/Application Support/LetThemBuild",
     "~/Library/Application Support/LetThemChat",
     "~/Library/Caches/com.letthemchat.desktop",
     "~/Library/HTTPStorages/com.letthemchat.desktop",
