@@ -20,15 +20,15 @@
 # tap's cask_renames.json maps letthembuild -> ltb, which Homebrew resolves as
 # a rename and tells the user about.
 cask "ltb" do
-  version "1.1.374"
+  version "1.1.375"
 
   on_arm do
-    sha256 "bf7fdafec93c9044af8651ce3bf7fde4916cd61ab0ddb49ea6cf6af377f27c13"
+    sha256 "0b4412e40b40255a03107e1f06d76692658cec46f65bd2c7ef9c513a75aa3347"
 
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-arm64-mac.zip"
   end
   on_intel do
-    sha256 "c05c8c3df3d69b47357f5c6b988c081a2a65e4e2342b6c1de8b22e0de13cc521"
+    sha256 "af5bc2a4eaa18733bb7faad635d823553fbd182e30c39a10608fea5b6da73a05"
 
     url "https://letthembuild.com/updates/LetThemBuild-#{version}-x64-mac.zip"
   end
